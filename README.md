@@ -1,6 +1,6 @@
 # C++ Multithreading Basics
 
-Personal learning project: five small C++ programs I wrote and ran on Linux (WSL, g++) while refreshing my multithreading skills. Each program shows one core idea, using a simple kitchen example (each thread is a cook).
+Personal learning project: six small C++ programs I wrote and ran on Linux (WSL, g++) while refreshing my multithreading skills. Each program shows one core idea, using a simple kitchen example (each thread is a cook).
 
 ## Programs
 
@@ -11,12 +11,14 @@ Personal learning project: five small C++ programs I wrote and ran on Linux (WSL
 | `race.cpp` | Race condition | Two threads increment a shared counter 1,000,000 times each without protection. |
 | `mutex.cpp` | `std::mutex`, `std::lock_guard` | The same counter, protected by a mutex. |
 | `deadlock.cpp` | Deadlock and its fix | Two threads lock two mutexes; fixed by always locking in the same order. |
+| `bell.cpp` | `std::condition_variable` | A cook thread sleeps until a waiter thread places an order and notifies it. |
 
 ## Results from my runs
 
 - **race.cpp:** expected 2,000,000, got 1,228,426, then 1,372,257, then 1,722,220. Updates were lost, and the result changed every run.
 - **mutex.cpp:** 2,000,000 on every run.
 - **deadlock.cpp:** with opposite lock order, the program froze. After changing both threads to lock `knife` then `board`, it finished and printed "kitchen closed".
+- **bell.cpp:** the cook waited, the waiter placed the order after 2 seconds, then the cook started cooking.
 
 ## What I learned
 
@@ -25,6 +27,7 @@ Personal learning project: five small C++ programs I wrote and ran on Linux (WSL
 - `count++` is read, add, write, so it is not safe when two threads share it.
 - `std::lock_guard` releases the mutex automatically at the end of its scope.
 - Taking locks in the same order in every thread prevents deadlock.
+- A condition variable lets a thread sleep until another thread notifies it. I call `wait()` inside a loop that checks the condition, because of spurious wakeups and in case the notify came before the wait.
 
 ## How to build and run
 
